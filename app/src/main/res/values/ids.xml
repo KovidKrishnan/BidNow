@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="editName" type="id" />
+    <item name="editPassword" type="id" />
+    <item name="profileImage" type="id" />
+    <item name="changeImageButton" type="id" />
+    <item name="editMobileNumber" type="id" />
+    <item name="saveButton" type="id" />
+</resources>

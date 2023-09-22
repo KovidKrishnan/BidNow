@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "632270109286",
+    "project_id": "bidnow-s30",
+    "storage_bucket": "bidnow-s30.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:632270109286:android:21b8f3f1f504e5b7be0ba7",
+        "android_client_info": {
+          "package_name": "com.minorproject.bidnow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "632270109286-9h6ha53mgsjbefuap1rtk72c0g6kq1oa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApbFH0OqIKiTQMxe8yhnWsS_uw81dy6gw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "632270109286-9h6ha53mgsjbefuap1rtk72c0g6kq1oa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

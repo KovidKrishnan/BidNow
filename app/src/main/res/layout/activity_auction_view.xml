@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:padding="16dp">
+
+            <!-- ... (Your other views) ... -->
+            <TextView
+                android:id="@+id/countDownTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/pathRelative"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:text="Seller: John Doe"
+                android:textColor="#03A9F4"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/auctionTitleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Auction Title"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- Auction Image -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/pathRelative"
+                android:layout_width="300dp"
+                android:layout_height="260dp"
+                android:layout_below="@id/auctionTitleTextView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp">
+
+                <ImageView
+                    android:id="@+id/auctionImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/logo_application" />
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- Seller Name -->
+
+            <!-- Auction Status -->
+
+            <!-- Starting Bid -->
+            <TextView
+                android:id="@+id/auctionStatusTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/pathRelative"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/startingBidTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/auctionStatusTextView"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:text="Starting Bid: $100"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Bids Section (You can use a RecyclerView or ListView here) -->
+            <TextView
+                android:id="@+id/productDescriptionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/startingBidTextView"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="20dp"
+                android:text="Product Description:\nThis is a detailed description of the product being auctioned."
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <ListView
+                android:id="@+id/bidsListView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/productDescriptionTextView"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:textColor="@color/black" />
+
+            <LinearLayout
+                android:id="@+id/buttonPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bidsListView"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="0dp"
+                android:baselineAligned="true"
+                android:gravity="center"
+                android:padding="10dp">
+
+                <Button
+                    android:id="@+id/placeBidButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:backgroundTint="#2196F3"
+                    android:text="Place Bid"
+                    app:cornerRadius="8dp" />
+
+                <TextView
+                    android:id="@+id/currentBidTextViewAuctionPage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/auctionStatusTextView"
+                    android:layout_marginStart="20dp"
+                    android:text="Current Bid: $100"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>
