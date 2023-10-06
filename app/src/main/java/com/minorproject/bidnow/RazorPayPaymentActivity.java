@@ -53,8 +53,7 @@ public class RazorPayPaymentActivity extends AppCompatActivity implements Paymen
                 amount = Math.round(Float.parseFloat(amountString));
 
                 Checkout checkout = new Checkout();
-                // checkout.setKeyID("rzp_test_sP0GiiCWIECpcC");
-                //expired key
+                 checkout.setKeyID("rzp_test_sP0GiiCWIECpcC");
 
                 JSONObject object = new JSONObject();
 

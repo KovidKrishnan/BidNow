@@ -78,6 +78,21 @@ public class AuctionViewActivity extends AppCompatActivity {
         adapter = new BidAdapter(options);
         bidsRecycler.setAdapter(adapter);
 
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                scrollToBottom();
+            }
+
+            private void scrollToBottom() {
+                bidsRecycler.scrollToPosition(adapter.getItemCount() - 1);
+            }
+        });
+
+// Define a method to scroll to the bottom of the RecyclerView
+
+
         auctionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
