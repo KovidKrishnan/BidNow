@@ -66,7 +66,7 @@ public class CreateAuctionActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
-        storageReference = firebaseStorage.getReference().child("Auctions/");
+        storageReference = firebaseStorage.getReference().child("Auctions/").child(Objects.requireNonNull(mAuth.getCurrentUser()).getUid() + System.currentTimeMillis());
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("Auctions");
 
@@ -133,34 +133,25 @@ public class CreateAuctionActivity extends AppCompatActivity {
 
 
 
-                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(mAuth.getCurrentUser().getUid());
+                username = mAuth.getCurrentUser().getUid();
+                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(username);
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String publicName = snapshot.child("username").getValue(String.class);
+                        Auction auction = new Auction(auctionId, title, description, startingBid, imageUrl,publicName,"Upcoming",startTimeInMillis,endTimeInMillis);
+                        databaseReference = databaseReference.child(auctionId);
 
-                userRef.child("username").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            String name = dataSnapshot.getValue(String.class);
-                            if(name != null) {
-                                username = name;
-                            }
-                            // Now you have the value of the "username" attribute from Firebase
-                            // You can use 'username' in your code as needed
-                        } else {
-                            // Handle the case where the "username" attribute doesn't exist or is null
-                            username = "BidNow";
-                        }
+                        saveAuctionDataToDatabase(auction);
                     }
+
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Handle any errors here
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
                 });
 
 
-                Auction auction = new Auction(auctionId, title, description, startingBid, imageUrl,username,"Upcoming",startTimeInMillis,endTimeInMillis);
-                databaseReference = databaseReference.child(auctionId);
-
-                saveAuctionDataToDatabase(auction);
             }
         });
     }
@@ -352,6 +343,8 @@ public class CreateAuctionActivity extends AppCompatActivity {
     private void saveAuctionDataToDatabase(Auction auction) {
         // Implement the code to save auction data to your database (e.g., Firebase)
         // databaseReference.child("auctions").push().setValue(auction);
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(Objects.requireNonNull(mAuth.getCurrentUser()).getUid()).child("CreatedAuctions").child(auction.getAuctionId());
+        userRef.setValue(auction.getAuctionId());
 
         databaseReference.setValue(auction).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

@@ -25,6 +25,7 @@ public class Auction {
         this.title = title;
         this.description = description;
         this.startingBid = startingBid;
+        this.currentBid = startingBid;
         this.imageUrl = imageUrl;
         this.sellerId = sellerId;
         this.auctionStatus = auctionStatus;

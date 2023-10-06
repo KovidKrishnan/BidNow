@@ -27,6 +27,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class HomeActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     private TextView logoutButton;
@@ -65,14 +67,14 @@ public class HomeActivity extends AppCompatActivity {
 
         createAuctionCard = findViewById(R.id.createAuctionCard);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(mAuth.getCurrentUser().getUid().toString());
+        databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 usernameString = snapshot.child("username").getValue(String.class);
-                creditValueString = snapshot.child("creditValue").getValue(Integer.class).toString();
+                creditValueString = Objects.requireNonNull(snapshot.child("creditValue").getValue(Integer.class)).toString();
                 creditValue.setText(creditValueString);
                 username.setText(usernameString);
 

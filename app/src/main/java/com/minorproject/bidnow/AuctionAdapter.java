@@ -16,6 +16,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class AuctionAdapter extends FirebaseRecyclerAdapter<Auction, AuctionAdapter.ViewHolder> {
 
@@ -33,20 +35,24 @@ public class AuctionAdapter extends FirebaseRecyclerAdapter<Auction, AuctionAdap
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Auction model) {
         // Bind the data to the views in the ViewHolder
-        Long endtime, starttime;
+        DatabaseReference auctionRef = FirebaseDatabase.getInstance().getReference().child("Auctions").child(model.getAuctionId());
         if (model.getStartDate() <= System.currentTimeMillis() && System.currentTimeMillis() <= model.getEndDate()) {
             model.setAuctionStatus("Live");
+            auctionRef.child("auctionStatus").setValue("Live");
         }
         else if(model.getEndDate() <= System.currentTimeMillis()){
             model.setAuctionStatus("Completed");
+            auctionRef.child("auctionStatus").setValue("Completed");
         }
         else{
             model.setAuctionStatus("Upcoming");
+            auctionRef.child("auctionStatus").setValue("Upcoming");
         }
 
         switch (model.getAuctionStatus()) {
             case "Upcoming":
                 holder.statusTextView.setTextColor(Color.parseColor("#FFA500"));
+
                 break;
             case "Live":
                 holder.statusTextView.setTextColor(Color.parseColor("#00FF22"));

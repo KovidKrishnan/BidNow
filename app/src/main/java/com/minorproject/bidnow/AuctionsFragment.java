@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ public class AuctionsFragment extends Fragment {
     private RecyclerView recyclerView;
     private AuctionAdapter adapter;
     private String category;
-    private ProgressBar loader;
 
     public AuctionsFragment(String category){
         this.category = category;
@@ -35,7 +33,7 @@ public class AuctionsFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        // Fetch and display "Live" auctions using FirebaseRecyclerOptions
+
         DatabaseReference auctionsRef = FirebaseDatabase.getInstance().getReference().child("Auctions");
         FirebaseRecyclerOptions<Auction> options =
                 new FirebaseRecyclerOptions.Builder<Auction>()
@@ -44,6 +42,7 @@ public class AuctionsFragment extends Fragment {
 
         adapter = new AuctionAdapter(options);
         recyclerView.setAdapter(adapter);
+
 
         return rootView;
     }

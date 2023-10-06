@@ -10,16 +10,13 @@ import com.google.android.material.tabs.TabLayout;
 
 public class AuctionListingActivity extends AppCompatActivity {
 
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auction_listing);
 
-        tabLayout = findViewById(R.id.tab_layout);
-        viewPager = findViewById(R.id.view_pager);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        ViewPager viewPager = findViewById(R.id.view_pager);
 
         AuctionPagerAdapter pagerAdapter = new AuctionPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);

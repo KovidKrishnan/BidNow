@@ -2,12 +2,13 @@ package com.minorproject.bidnow;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +34,9 @@ public class AuctionViewActivity extends AppCompatActivity {
     private CountDownTimer auctionCountdownTimer;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference auctionRef;
+    private Button addBid;
     private Long endtime, starttime;
+    private String enrollmentStatus;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -47,10 +51,12 @@ public class AuctionViewActivity extends AppCompatActivity {
         auctionStatus = findViewById(R.id.auctionStatusTextView);
         countDownTextView = findViewById(R.id.countDownTextView);
         auctionImageView = findViewById(R.id.auctionImageView);
+        addBid = findViewById(R.id.placeBidButton);
 
         animateElementsUp();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        auctionRef = firebaseDatabase.getReference("Auctions").child(Objects.requireNonNull(getIntent().getStringExtra("auctionId")));
+        String auctionId = getIntent().getStringExtra("auctionId");
+        auctionRef = firebaseDatabase.getReference("Auctions").child(auctionId);
 
         auctionRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -72,23 +78,10 @@ public class AuctionViewActivity extends AppCompatActivity {
                     auctionDescription.setText(description);
                 }
 
-//                String auctionStatusStr = snapshot.child("auctionStatus").getValue(String.class);
-//                if (auctionStatusStr != null) {
-//                    auctionStatus.setText(auctionStatusStr);
-
-                    switch (Objects.requireNonNull(snapshot.child("auctionStatus").getValue(String.class))) {
-                        case "Upcoming":
-                            auctionStatus.setTextColor(Color.parseColor("#FFA500"));
-                            break;
-                        case "Live":
-                            auctionStatus.setTextColor(Color.parseColor("#00FF22"));
-                            break;
-                        case "Completed":
-                            auctionStatus.setTextColor(Color.parseColor("#FF2200"));
-                            break;
-                        default:
-                            throw new IllegalStateException("Unexpected value: ");
-                    }
+                String auctionStatusStr = snapshot.child("auctionStatus").getValue(String.class);
+                if (auctionStatusStr != null) {
+                    auctionStatus.setText(auctionStatusStr);
+                }
 
                 Long currentBidLong = snapshot.child("currentBid").getValue(Long.class);
                 if (currentBidLong != null) {
@@ -111,6 +104,64 @@ public class AuctionViewActivity extends AppCompatActivity {
                 // You can also show an error message to the user
             }
         });
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users")
+                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
+
+        userRef.child("EnrolledAuctions").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChild(auctionId)) {
+                    addBid.setText("Un-enroll Now");
+                    enrollmentStatus = "Enrolled";
+                } else {
+                    enrollmentStatus = "Un-enrolled";
+                    addBid.setText("Enroll Now");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        String aucStatus = auctionStatus.getText().toString().trim();
+
+        addBid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (enrollmentStatus) {
+                    case "Un-enrolled":
+                        if (aucStatus.equals("Upcoming")) {
+                            // Handle enrollment logic here for upcoming auctions
+                            userRef.child("EnrolledAuctions").child(auctionId).setValue(true);
+                            addBid.setText("Un-enroll Now");
+                            enrollmentStatus = "Enrolled";
+                        } else if (aucStatus.equals("Live")) {
+                            // Handle placing a bid logic here for live auctions
+                            // You can launch a bidding activity or implement your bidding logic here
+                            // For now, I'm just changing the button text to "Place Bid"
+                            addBid.setText("Place Bid");
+                            enrollmentStatus = "PlacedBid"; // Adjust status accordingly
+                        }
+                        break;
+                    case "Enrolled":
+                        // Handle un-enrollment logic here
+                        userRef.child("EnrolledAuctions").child(auctionId).removeValue();
+                        addBid.setText("Enroll Now");
+                        enrollmentStatus = "Un-enrolled";
+                        break;
+                    case "PlacedBid":
+                        // Handle logic for the case when a bid is already placed
+                        // You can implement your logic here
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
+
     }
 
     private void startCountdown() {
@@ -121,18 +172,17 @@ public class AuctionViewActivity extends AppCompatActivity {
             Long timeLeftMillis = starttime - currentTimeMillis;
             if (timeLeftMillis <= 0) {
                 timeLeftMillis = endtime - currentTimeMillis;
-                if(timeLeftMillis <= 0){
+                if (timeLeftMillis <= 0) {
                     auctionStatus.setText("Completed");
-                }
-                else{
+                    auctionRef.child("auctionStatus").setValue("Completed");
+                } else {
                     auctionRef.child("auctionStatus").setValue("Live");
                     auctionStatus.setText("Live");
                     live = true;
                 }
-
-            }
-            else{
+            } else {
                 auctionStatus.setText("Upcoming");
+                auctionRef.child("auctionStatus").setValue("Upcoming");
             }
             if (countDownTextView != null) {
                 if (timeLeftMillis > 0) { // Ensure the auction is not already ended
@@ -168,10 +218,12 @@ public class AuctionViewActivity extends AppCompatActivity {
                     }.start();
                 } else {
                     countDownTextView.setText("Auction Ended"); // Handle case where the auction has already ended
+                    auctionRef.child("auctionStatus").setValue("Completed");
                 }
             }
         }
     }
+
     private void animateElementsUp() {
         // Get references to your elements that you want to animate
         TextView auctionDescription = findViewById(R.id.productDescriptionTextView);
@@ -207,9 +259,6 @@ public class AuctionViewActivity extends AppCompatActivity {
         auctionStatus.startAnimation(animation3);
         auctionStartBid.startAnimation(animation4);
         auctionDescription.startAnimation(animation5);
-
-
-
         buttonPanel.startAnimation(animation6);
     }
 
@@ -225,5 +274,4 @@ public class AuctionViewActivity extends AppCompatActivity {
     public void onBackPressed() {
         startActivity(new Intent(AuctionViewActivity.this, AuctionListingActivity.class));
     }
-
 }
