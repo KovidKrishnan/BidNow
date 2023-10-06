@@ -2,9 +2,11 @@ package com.minorproject.bidnow;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -12,20 +14,24 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.Objects;
 
 public class AuctionViewActivity extends AppCompatActivity {
 
@@ -36,8 +42,9 @@ public class AuctionViewActivity extends AppCompatActivity {
     private DatabaseReference auctionRef;
     private Button addBid;
     private Long endtime, starttime;
-    private String enrollmentStatus;
+    private BidAdapter adapter;
 
+    private RecyclerView bidsRecycler;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +64,19 @@ public class AuctionViewActivity extends AppCompatActivity {
         firebaseDatabase = FirebaseDatabase.getInstance();
         String auctionId = getIntent().getStringExtra("auctionId");
         auctionRef = firebaseDatabase.getReference("Auctions").child(auctionId);
+
+        bidsRecycler = findViewById(R.id.bidsListView);
+        bidsRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Auctions").child(auctionId).child("Bids");
+
+        FirebaseRecyclerOptions<Bid> options =
+                new FirebaseRecyclerOptions.Builder<Bid>()
+                        .setQuery(databaseReference, Bid.class)
+                        .build();
+
+        adapter = new BidAdapter(options);
+        bidsRecycler.setAdapter(adapter);
 
         auctionRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -81,6 +101,20 @@ public class AuctionViewActivity extends AppCompatActivity {
                 String auctionStatusStr = snapshot.child("auctionStatus").getValue(String.class);
                 if (auctionStatusStr != null) {
                     auctionStatus.setText(auctionStatusStr);
+                    switch (auctionStatusStr){
+                        case "Live":
+                            auctionStatus.setTextColor(Color.parseColor("#008000"));
+                            break;
+                        case "Upcoming":
+                            auctionStatus.setTextColor(Color.parseColor("#FFA500"));
+                            break;
+                        case "Completed":
+                            auctionStatus.setTextColor(Color.parseColor("#FF0000"));
+                            addBid.setEnabled(false);
+                            break;
+                        default:
+                            auctionStatus.setTextColor(Color.parseColor("#000000"));
+                    }
                 }
 
                 Long currentBidLong = snapshot.child("currentBid").getValue(Long.class);
@@ -105,51 +139,89 @@ public class AuctionViewActivity extends AppCompatActivity {
             }
         });
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users")
-                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
-
-        userRef.child("EnrolledAuctions").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild(auctionId)) {
-                    addBid.setText("Un-enroll Now");
-                    enrollmentStatus = "Enrolled";
-                } else {
-                    enrollmentStatus = "Un-enrolled";
-                    addBid.setText("Enroll Now");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
         addBid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switch (enrollmentStatus) {
-                    case "Un-enrolled":
-                        // Handle enrollment logic here
-                        userRef.child("EnrolledAuctions").child(auctionId).setValue(true);
-                        addBid.setText("Un-enroll Now");
-                        enrollmentStatus = "Enrolled";
-                        break;
-                    case "Enrolled":
-                        // Handle un-enrollment logic here
-                        userRef.child("EnrolledAuctions").child(auctionId).removeValue();
-                        addBid.setText("Enroll Now");
-                        enrollmentStatus = "Un-enrolled";
-                        break;
-                    default:
-                        break;
-                }
+                auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot auctionSnapshot) {
+                        if (auctionSnapshot.child("auctionStatus").getValue(String.class).equals("Live")) {
+                            double currentBid = auctionSnapshot.child("currentBid").getValue(Double.class);
+                            double amountBid;
+
+                            if (currentBid < 10000) amountBid = 500;
+                            else if (currentBid < 25000) amountBid = 1000;
+                            else if (currentBid < 100000) amountBid = 2500;
+                            else if (currentBid < 500000) amountBid = 5000;
+                            else if (currentBid < 1000000) amountBid = 10000;
+                            else amountBid = 25000;
+
+                            // Generate a unique key for the bid using push()
+                            String bidId = auctionRef.child("Bids").push().getKey();
+                            String bidderId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            double bidAmount = amountBid + currentBid;
+                            long bidTimestamp = System.currentTimeMillis();
+                            Bid bid = new Bid(bidId, bidderId, bidAmount, bidTimestamp, auctionId);
+
+                            // Add the bid under a unique key in the "Bids" node
+                            auctionRef.child("Bids").child(bidId).setValue(bid)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                // Update the current bid amount
+                                                auctionRef.child("currentBid").setValue(bidAmount)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @SuppressLint("NotifyDataSetChanged")
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    // Bid and current bid amount updated successfully
+                                                                    adapter.notifyDataSetChanged();
+                                                                    Toast.makeText(AuctionViewActivity.this, "Bid placed successfully!", Toast.LENGTH_SHORT).show();
+
+                                                                } else {
+                                                                    // Failed to update current bid amount
+                                                                    Toast.makeText(AuctionViewActivity.this, "Failed to update current bid amount", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                // Failed to add bid
+                                                Toast.makeText(AuctionViewActivity.this, "Unable to add bid!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        } else {
+                            // Handle the case when the auction is not live
+                            Toast.makeText(AuctionViewActivity.this, "Auction is not live. Cannot place a bid.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
 
+
+
     }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
 
     private void startCountdown() {
         if (endtime != null && starttime != null) {
@@ -220,6 +292,7 @@ public class AuctionViewActivity extends AppCompatActivity {
         TextView countDownTextView = findViewById(R.id.countDownTextView);
         CardView auctionImageView = findViewById(R.id.pathRelative);
         LinearLayout buttonPanel = findViewById(R.id.buttonPanel);
+        RecyclerView bidslist = findViewById(R.id.bidsListView);
 
         // Create animations for each element
         Animation animation1 = AnimationUtils.loadAnimation(this, R.anim.slide_up_animation);
@@ -247,6 +320,7 @@ public class AuctionViewActivity extends AppCompatActivity {
         auctionStartBid.startAnimation(animation4);
         auctionDescription.startAnimation(animation5);
         buttonPanel.startAnimation(animation6);
+        bidslist.startAnimation(animation7);
     }
 
     @Override
@@ -259,6 +333,19 @@ public class AuctionViewActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        // Start the AuctionListingActivity when the back button is pressed
         startActivity(new Intent(AuctionViewActivity.this, AuctionListingActivity.class));
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            // Start the AuctionListingActivity when the home button is pressed
+            startActivity(new Intent(AuctionViewActivity.this, AuctionListingActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
