@@ -125,35 +125,22 @@ public class AuctionViewActivity extends AppCompatActivity {
 
             }
         });
-        String aucStatus = auctionStatus.getText().toString().trim();
 
         addBid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 switch (enrollmentStatus) {
                     case "Un-enrolled":
-                        if (aucStatus.equals("Upcoming")) {
-                            // Handle enrollment logic here for upcoming auctions
-                            userRef.child("EnrolledAuctions").child(auctionId).setValue(true);
-                            addBid.setText("Un-enroll Now");
-                            enrollmentStatus = "Enrolled";
-                        } else if (aucStatus.equals("Live")) {
-                            // Handle placing a bid logic here for live auctions
-                            // You can launch a bidding activity or implement your bidding logic here
-                            // For now, I'm just changing the button text to "Place Bid"
-                            addBid.setText("Place Bid");
-                            enrollmentStatus = "PlacedBid"; // Adjust status accordingly
-                        }
+                        // Handle enrollment logic here
+                        userRef.child("EnrolledAuctions").child(auctionId).setValue(true);
+                        addBid.setText("Un-enroll Now");
+                        enrollmentStatus = "Enrolled";
                         break;
                     case "Enrolled":
                         // Handle un-enrollment logic here
                         userRef.child("EnrolledAuctions").child(auctionId).removeValue();
                         addBid.setText("Enroll Now");
                         enrollmentStatus = "Un-enrolled";
-                        break;
-                    case "PlacedBid":
-                        // Handle logic for the case when a bid is already placed
-                        // You can implement your logic here
                         break;
                     default:
                         break;

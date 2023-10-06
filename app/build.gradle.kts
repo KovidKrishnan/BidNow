@@ -5,11 +5,12 @@ plugins {
 
 android {
     namespace = "com.minorproject.bidnow"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.minorproject.bidnow"
         minSdk = 21
+        //noinspection OldTargetApi
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -39,7 +40,7 @@ dependencies {
     implementation ("com.firebaseui:firebase-ui-database:8.0.2")
     implementation("com.razorpay:checkout:1.6.34")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0")
     implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

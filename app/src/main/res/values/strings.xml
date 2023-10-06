@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">BidNow</string>
-        <!-- Strings for navigation drawer accessibility -->
-        <string name="navigation_drawer_open">Open navigation drawer</string>
-        <string name="navigation_drawer_close">Close navigation drawer</string>
-        <!-- Other string resources for your app -->
+    <!-- Strings for navigation drawer accessibility -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <!-- Other string resources for your app -->
 
 </resources>

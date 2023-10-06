@@ -39,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
     FirebaseUser userFirebase;
     String usernameString,creditValueString;
     RelativeLayout auctionsCard,createAuctionCard;
-    RelativeLayout myActivityCard;
+    RelativeLayout myActivityCard, walletCreditCard;
     ImageView instagram, linkedIn, twitter;
 
     @Override
@@ -54,6 +54,7 @@ public class HomeActivity extends AppCompatActivity {
         username = findViewById(R.id.usernameTextView);
         creditValue = findViewById(R.id.creditValueTextView);
         myActivityCard = findViewById(R.id.myActivityCard);
+        walletCreditCard = findViewById(R.id.walletTopupCard);
 
         instagram = findViewById(R.id.instagramLogo);
         linkedIn = findViewById(R.id.linkedinLogo);
@@ -98,6 +99,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(HomeActivity.this,CreateAuctionActivity.class));
+            }
+        });
+
+        walletCreditCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HomeActivity.this, RazorPayPaymentActivity.class));
             }
         });
 
