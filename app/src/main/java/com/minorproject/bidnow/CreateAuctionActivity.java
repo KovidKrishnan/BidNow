@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -43,7 +44,7 @@ import java.util.Objects;
 public class CreateAuctionActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
     EditText editTitle, editDescription, editStartingBid;
-    Button btnStartDate,btnEndDate,btnCreateAuction,btnUploadImage;
+    Button btnStartDate,btnEndDate,btnCreateAuction;
     private ImageView imageAuction;
     private Uri selectedImageUri;
     private Uri uploadedImageUri;
@@ -56,9 +57,11 @@ public class CreateAuctionActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private String imageUrl;
     private String username;
+    private DatabaseReference userCreditRef;
 
     private FirebaseAuth mAuth;
     boolean isStartDateSet = false;
+    int creditValue = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,10 +72,13 @@ public class CreateAuctionActivity extends AppCompatActivity {
         storageReference = firebaseStorage.getReference().child("Auctions/").child(Objects.requireNonNull(mAuth.getCurrentUser()).getUid() + System.currentTimeMillis());
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("Auctions");
+        userCreditRef = FirebaseDatabase.getInstance().getReference("Users").child(mAuth.getCurrentUser().getUid());
 
         editTitle = findViewById(R.id.editTitle);
         editDescription = findViewById(R.id.editDescription);
         editStartingBid = findViewById(R.id.editStartingBid);
+
+        creditValue = getIntent().getIntExtra("creditValue", 0);
 
         imageAuction = findViewById(R.id.imageAuction);
         imageAuction.setOnClickListener(new View.OnClickListener() {
@@ -210,7 +216,6 @@ public class CreateAuctionActivity extends AppCompatActivity {
 
         // Calculate the minimum start time (10 minutes after the current time)
         Calendar minStartTime = Calendar.getInstance();
-        minStartTime.add(Calendar.MINUTE, 10);
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(CreateAuctionActivity.this,
                 new DatePickerDialog.OnDateSetListener() {
@@ -351,6 +356,7 @@ public class CreateAuctionActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
                     Toast.makeText(CreateAuctionActivity.this, "Auction Created Successfully!", Toast.LENGTH_SHORT).show();
+                    userCreditRef.child("creditValue").setValue(creditValue - 500);
                     startActivity(new Intent(CreateAuctionActivity.this,HomeActivity.class));
                 }
                 else{

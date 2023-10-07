@@ -1,6 +1,7 @@
 package com.minorproject.bidnow;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -75,9 +76,39 @@ public class HomeActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 usernameString = snapshot.child("username").getValue(String.class);
+                int credit = Objects.requireNonNull(snapshot.child("creditValue").getValue(Integer.class));
                 creditValueString = Objects.requireNonNull(snapshot.child("creditValue").getValue(Integer.class)).toString();
                 creditValue.setText(creditValueString);
                 username.setText(usernameString);
+
+                if(credit < 500) {
+                    createAuctionCard.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Toast.makeText(HomeActivity.this, "Low Credit value, Top-up the wallet now", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(HomeActivity.this, RazorPayPaymentActivity.class));
+                        }
+                    });
+                    creditValue.setTextColor(Color.parseColor("#FF0000"));
+
+                    creditValue.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Toast.makeText(HomeActivity.this, "Low Credit value, Top-up the wallet now", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(HomeActivity.this, RazorPayPaymentActivity.class));
+                        }
+                    });
+                }
+                else {
+                    createAuctionCard.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(HomeActivity.this, CreateAuctionActivity.class);
+                            intent.putExtra("creditValue", credit);
+                            startActivity(intent);
+                        }
+                    });
+                }
 
             }
 
@@ -106,6 +137,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(HomeActivity.this, RazorPayPaymentActivity.class));
+            }
+        });
+
+        myActivityCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HomeActivity.this, AuctionListingActivity.class));
             }
         });
 

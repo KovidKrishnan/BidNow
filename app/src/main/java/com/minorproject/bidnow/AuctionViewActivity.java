@@ -33,6 +33,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class AuctionViewActivity extends AppCompatActivity {
 
     private TextView auctionTitle, auctionDescription, auctionStartBid, auctionCurrentBid, auctionStatus, countDownTextView;
@@ -136,6 +138,20 @@ public class AuctionViewActivity extends AppCompatActivity {
                 if (currentBidLong != null) {
                     auctionCurrentBid.setText("₹" + currentBidLong.toString());
                 }
+                DatabaseReference userref = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                userref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot usersnapshot) {
+                        if(usersnapshot.child("username").getValue(String.class).equals(snapshot.child("sellerId").getValue(String.class))){
+                            addBid.setEnabled(false);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
                 Long startingBidLong = snapshot.child("startingBid").getValue(Long.class);
                 if (startingBidLong != null) {
@@ -193,7 +209,6 @@ public class AuctionViewActivity extends AppCompatActivity {
                                                                 if (task.isSuccessful()) {
                                                                     // Bid and current bid amount updated successfully
                                                                     adapter.notifyDataSetChanged();
-                                                                    Toast.makeText(AuctionViewActivity.this, "Bid placed successfully!", Toast.LENGTH_SHORT).show();
 
                                                                 } else {
                                                                     // Failed to update current bid amount
@@ -362,5 +377,4 @@ public class AuctionViewActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }
