@@ -1,43 +1,48 @@
 package com.minorproject.bidnow;
 
-import static android.app.PendingIntent.getActivity;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import java.util.ArrayList;
 
 public class MyActivityActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
+    private VictoryAuctionAdapter adapter;
+    private ArrayList<Auction> auctionsList;
 
-    @SuppressLint({"ResourceType", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_activity);
+        setContentView(R.layout.my_activity_screen);
 
-        recyclerView = findViewById(R.id.activityRecyclerView);
+        CardView created = findViewById(R.id.my_created_auctions);
+        CardView victory = findViewById(R.id.my_won_auctions);
 
-        DatabaseReference createdAuctionsRef = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("CreatedAuctions");
+        created.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MyActivityActivity.this, CreatedAuctionsActivity.class));
+            }
+        });
 
-        DatabaseReference auctionsRef = FirebaseDatabase.getInstance().getReference("Auctions");
+        victory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MyActivityActivity.this, WonAuctionsActivity.class));
+            }
+        });
 
 
     }
+
     @Override
     public void onBackPressed() {
         startActivity(new Intent(MyActivityActivity.this, HomeActivity.class));
     }
-
 }

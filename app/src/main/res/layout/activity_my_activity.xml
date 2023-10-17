@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/backgroundAuctionsLists_myactivity"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/auction_list_background"
+    tools:context=".AuctionListingActivity">
 
-    <TextView
-        android:id="@+id/textView3"
+    <com.google.android.material.tabs.TabLayout
+        android:layout_margin="0dp"
+        android:id="@+id/tab_layout_myactivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text="TextView"
-        android:textSize="30sp"
-        android:textStyle="bold" />
-    <ScrollView
+        app:tabMode="scrollable" />
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager_myactivity"
         android:layout_width="match_parent"
-        android:layout_below="@+id/textView3"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tab_layout_myactivity"
+        android:layout_weight="1" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/activityRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </ScrollView>
 </RelativeLayout>

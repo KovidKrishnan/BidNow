@@ -1,0 +1,74 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:clickable="true"
+    android:foreground="@drawable/ripple_effect"
+    app:cardCornerRadius="12dp"
+    android:layout_marginBottom="8dp"
+    app:cardElevation="4dp">
+
+    <!-- LinearLayout for the auction item content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal">
+
+        <!-- ImageView for the image -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:elevation="8dp"
+            android:layout_marginRight="10dp"
+            app:cardCornerRadius="12dp">
+
+            <ImageView
+                android:id="@+id/auctionImageDisplayViewMyActivity"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/logo_application"
+                android:layout_marginRight="16dp" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- TextViews for title, seller, and status/countdown -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/titleDisplayViewMyActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Auction Title"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sellerDisplayViewMyActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:text="Seller Name"/>
+
+            <!-- Conditional TextViews for status/countdown -->
+            <TextView
+                android:id="@+id/bidDisplayViewMyActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Staring bid: "
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/statusDisplayViewMyActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#00ff00"
+                android:textStyle="bold"
+                android:text="Live until:"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -143,7 +143,7 @@ public class HomeActivity extends AppCompatActivity {
         myActivityCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(HomeActivity.this, AuctionListingActivity.class));
+                startActivity(new Intent(HomeActivity.this, MyActivityActivity.class));
             }
         });
 

@@ -45,6 +45,7 @@ public class AuctionViewActivity extends AppCompatActivity {
     private Button addBid;
     private Long endtime, starttime;
     private BidAdapter adapter;
+    private String userId;
 
     private RecyclerView bidsRecycler;
     @SuppressLint("SetTextI18n")
@@ -62,9 +63,12 @@ public class AuctionViewActivity extends AppCompatActivity {
         auctionImageView = findViewById(R.id.auctionImageView);
         addBid = findViewById(R.id.placeBidButton);
 
+        userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+
         animateElementsUp();
         firebaseDatabase = FirebaseDatabase.getInstance();
         String auctionId = getIntent().getStringExtra("auctionId");
+        assert auctionId != null;
         auctionRef = firebaseDatabase.getReference("Auctions").child(auctionId);
 
         bidsRecycler = findViewById(R.id.bidsListView);
@@ -170,9 +174,24 @@ public class AuctionViewActivity extends AppCompatActivity {
             }
         });
 
+        auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child("currentBidder").exists() && snapshot.child("currentBidder").getValue(String.class).equals(userId)){
+                    addBid.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         addBid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                auctionRef.child("currentBidder").setValue(userId);
                 auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot auctionSnapshot) {

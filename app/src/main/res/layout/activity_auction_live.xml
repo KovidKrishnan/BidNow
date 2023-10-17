@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/activity_auction_live_id"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="8dp"
+        app:cardCornerRadius="4dp"
+        app:cardUseCompatPadding="true"
+        app:cardPreventCornerOverlap="false">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/auctionActivityImageView"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:src="@drawable/image1"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/titleActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/auctionActivityImageView"
+                android:layout_marginStart="16dp"
+                android:text="Title"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/currentBidderActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/titleActivityTextView"
+                android:layout_toRightOf="@id/auctionActivityImageView"
+                android:layout_marginStart="16dp"
+                android:text="Current Bidder: John Doe"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/currentAmountActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/currentBidderActivityTextView"
+                android:layout_toRightOf="@id/auctionActivityImageView"
+                android:layout_marginStart="16dp"
+                android:text="Current Amount: $100"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/auctionStatusActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/currentAmountActivityTextView"
+                android:layout_toRightOf="@id/auctionActivityImageView"
+                android:layout_marginStart="16dp"
+                android:text="Status: Live"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/auctionActivityImageView"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:padding="8dp">
+
+                <Button
+                    android:id="@+id/contactButton"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/auction_contact"
+                    />
+
+                <Button
+                    android:id="@+id/deleteAuctionButton"
+                    android:layout_width="65dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/auction_delete"
+                    />
+
+                <Button
+                    android:id="@+id/declareWinnerButton"
+                    android:layout_width="60dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/auction_declare_winner"
+                    />
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+
+
+
+</RelativeLayout>

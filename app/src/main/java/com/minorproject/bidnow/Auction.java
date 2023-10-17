@@ -14,7 +14,9 @@ public class Auction {
     private long startDate; // Start date and time in milliseconds
     private long endDate; // End date and time in milliseconds
     private List<Bid> bids; // List of bids associated with the auction
+    private String sellerName;
     private int reports;
+    private String winnerId;
 
     // Constructors (including one for Firebase)
     public Auction() {
@@ -130,4 +132,7 @@ public class Auction {
     }
 
 
+    public String getWinnerId() {
+        return this.winnerId;
+    }
 }

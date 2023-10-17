@@ -78,13 +78,25 @@
             android:hint="Confirm Password"
             android:inputType="textPassword" />
 
+        <EditText
+            android:id="@+id/phoneEditText"
+            android:layout_width="360dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/confirmPasswordRegisterEditText"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_border"
+            android:hint="Phone"
+            android:inputType="textPassword"
+            android:padding="15dp" />
+
         <Button
             android:id="@+id/registerButton"
             android:layout_width="170dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/confirmPasswordRegisterEditText"
+            android:layout_below="@+id/phoneEditText"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="21dp"
+            android:layout_marginTop="16dp"
             android:backgroundTint="#EBA22D"
             android:text="Register"
             app:cornerRadius="10dp" />

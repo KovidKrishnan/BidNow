@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/dialog_sign_out.xml -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    app:cornerRadius="12dp"
+    android:layout_gravity="center"
+    style="@style/Theme.AppCompat"
+    android:elevation="8dp"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/dialogDeleteTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Are you sure you want to Delete?"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/btnDeleteYes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialogDeleteTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#cc00"
+        app:cornerRadius="8dp"
+        android:text="Yes, Delete"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/btnDeleteNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No"
+        android:backgroundTint="#99cc00"
+        android:textColor="@android:color/white"
+        app:cornerRadius="8dp"
+        android:layout_below="@id/btnDeleteYes"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"/>
+</RelativeLayout>

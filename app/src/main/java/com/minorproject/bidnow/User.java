@@ -5,15 +5,17 @@ public class User {
     private String username;
     private String email;
     private String password;
+    private String phone;
     private Integer creditValue;
     private Integer biddedAuctionsCount;
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, String phone) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.creditValue = 0;
         this.biddedAuctionsCount = 0;
+        this.phone = phone;
     }
 
     // Getter and Setter methods for userId, username, email, password, creditValue, and reportCount
