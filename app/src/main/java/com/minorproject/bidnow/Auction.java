@@ -76,7 +76,7 @@ public class Auction {
     }
 
     public double getCurrentBid() {
-        return currentBid;
+        return this.currentBid;
     }
 
     public void setCurrentBid(double currentBid) {

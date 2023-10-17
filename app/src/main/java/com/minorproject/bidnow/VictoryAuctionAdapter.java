@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class VictoryAuctionAdapter extends RecyclerView.Adapter<VictoryAuctionAdapter.ViewHolder> {
     private ArrayList<Auction> auctionList;
@@ -68,23 +69,33 @@ public class VictoryAuctionAdapter extends RecyclerView.Adapter<VictoryAuctionAd
         holder.statusTextView.setText(model.getAuctionStatus());
         holder.currentBidTextView.setText("Current Bid: ₹" + model.getStartingBid());
 
-        holder.currentBidderTextView.setText("Current Bidder: " + model.getSellerId());
+        holder.currentBidderTextView.setText("Current Bidder: " + model.getWinnerId());
         loadImageUsingGlide(holder.imageView, model.getImageUrl());
 
         holder.contactWinner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FirebaseDatabase.getInstance().getReference("Users").child("currentBidder").addListenerForSingleValueEvent(new ValueEventListener() {
+                auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String mobile = snapshot.child("phone").getValue(String.class);
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/91" + mobile));
-                        context.startActivity(intent);
+                        FirebaseDatabase.getInstance().getReference("Users").child(Objects.requireNonNull(snapshot.child("auctionId").getValue(String.class)).substring(0,28)).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot usersnapshot) {
+                                String mobile = usersnapshot.child("phone").getValue(String.class);
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/91" + mobile));
+                                context.startActivity(intent);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                // Handle any errors
+                            }
+                        });
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        // Handle any errors
+
                     }
                 });
 

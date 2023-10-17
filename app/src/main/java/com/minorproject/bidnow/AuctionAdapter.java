@@ -66,7 +66,7 @@ public class AuctionAdapter extends FirebaseRecyclerAdapter<Auction, AuctionAdap
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.child("currentBidder").exists()){
-                            auctionRef.child("winnerBidder").setValue(snapshot.child("currentBidder").getValue(String.class));
+                            auctionRef.child("winnerId").setValue(snapshot.child("currentBidder").getValue(String.class));
                         }
                     }
                     @Override

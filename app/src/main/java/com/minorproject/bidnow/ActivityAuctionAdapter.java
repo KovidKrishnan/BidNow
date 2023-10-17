@@ -52,55 +52,79 @@ public class ActivityAuctionAdapter extends RecyclerView.Adapter<ActivityAuction
 
     @Override
     public void onBindViewHolder(@NonNull ActivityAuctionAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-
+        String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         Auction model = auctionList.get(position);
 
         // settexts to be filled
 
         // Bind the data to the views in the ViewHolder
         DatabaseReference auctionRef = FirebaseDatabase.getInstance().getReference().child("Auctions").child(model.getAuctionId());
-        if (model.getStartDate() <= System.currentTimeMillis() && System.currentTimeMillis() <= model.getEndDate()) {
-            model.setAuctionStatus("Live");
-            auctionRef.child("auctionStatus").setValue("Live");
-        }
-        else if(model.getEndDate() <= System.currentTimeMillis()){
-            model.setAuctionStatus("Completed");
-            auctionRef.child("auctionStatus").setValue("Completed");
-        }
-        else{
-            model.setAuctionStatus("Upcoming");
-            auctionRef.child("auctionStatus").setValue("Upcoming");
-        }
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(userId);
+        auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Auction model = snapshot.getValue(Auction.class);
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                        if (model.getStartDate() <= System.currentTimeMillis() && System.currentTimeMillis() <= model.getEndDate()) {
+                            model.setAuctionStatus("Live");
+                            auctionRef.child("auctionStatus").setValue("Live");
+                        }
+                        else if(model.getEndDate() <= System.currentTimeMillis()){
+                            model.setAuctionStatus("Completed");
+                            auctionRef.child("auctionStatus").setValue("Completed");
+                        }
+                        else{
+                            model.setAuctionStatus("Upcoming");
+                            auctionRef.child("auctionStatus").setValue("Upcoming");
+                        }
 
-        switch (model.getAuctionStatus()) {
-            case "Upcoming":
-                holder.statusTextView.setTextColor(Color.parseColor("#FFA500"));
-                holder.contactWinner.setEnabled(false);
-                holder.declareWinner.setEnabled(false);
-                break;
-            case "Live":
-                holder.statusTextView.setTextColor(Color.parseColor("#00FF22"));
-                holder.contactWinner.setEnabled(false);
-                if(String.valueOf(model.getStartingBid()).equals(String.valueOf(model.getCurrentBid()))){
-                    holder.declareWinner.setEnabled(false);
-                }
-                break;
-            case "Completed":
-                holder.statusTextView.setTextColor(Color.parseColor("#FF2200"));
-                holder.declareWinner.setEnabled(false);
-                if(String.valueOf(model.getStartingBid()).equals(String.valueOf(model.getCurrentBid()))){
-                    holder.contactWinner.setEnabled(false);
-                }
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + model.getAuctionStatus());
-        }
-        holder.titleTextView.setText(model.getTitle());
-        holder.statusTextView.setText(model.getAuctionStatus());
-        holder.currentBidTextView.setText("Current Bid: ₹" + model.getStartingBid());
+                        switch (model.getAuctionStatus()) {
+                            case "Upcoming":
+                                holder.statusTextView.setTextColor(Color.parseColor("#FFA500"));
+                                holder.contactWinner.setEnabled(false);
+                                holder.declareWinner.setEnabled(false);
+                                break;
+                            case "Live":
+                                holder.statusTextView.setTextColor(Color.parseColor("#00FF22"));
+                                holder.contactWinner.setEnabled(false);
+                                if(String.valueOf(model.getStartingBid()).equals(String.valueOf(model.getCurrentBid()))){
+                                    holder.declareWinner.setEnabled(false);
+                                }
+                                break;
+                            case "Completed":
+                                holder.statusTextView.setTextColor(Color.parseColor("#FF2200"));
+                                holder.declareWinner.setEnabled(false);
+                                if(String.valueOf(model.getStartingBid()).equals(String.valueOf(model.getCurrentBid()))){
+                                    holder.contactWinner.setEnabled(false);
+                                }
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + model.getAuctionStatus());
+                        }
+                        holder.titleTextView.setText(model.getTitle());
+                        holder.statusTextView.setText(model.getAuctionStatus());
+                        holder.currentBidTextView.setText("Current Bid: ₹" + model.getCurrentBid());
 
-        holder.currentBidderTextView.setText("Current Bidder: " + model.getSellerId());
-        loadImageUsingGlide(holder.imageView, model.getImageUrl());
+                        holder.currentBidderTextView.setText("Current Bidder: " + userSnapshot.child("username").getValue(String.class));
+                        loadImageUsingGlide(holder.imageView, model.getImageUrl());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         holder.deleteAuction.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +161,9 @@ public class ActivityAuctionAdapter extends RecyclerView.Adapter<ActivityAuction
                         auctionRef.child("endDate").setValue(snapshot.child("startDate").getValue(Long.class)).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
+                                holder.currentBidTextView.setText("Final Bid: ₹" + model.getCurrentBid());
+
+                                holder.currentBidderTextView.setText("Final Bidder: " + model.getWinnerId());
                                 Toast.makeText(context, "Winner Declared", Toast.LENGTH_SHORT).show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -145,7 +172,7 @@ public class ActivityAuctionAdapter extends RecyclerView.Adapter<ActivityAuction
                                 Toast.makeText(context, "Unable to declare winner", Toast.LENGTH_SHORT).show();
                             }
                         });
-                        auctionRef.child("winnerBidder").setValue(userId);
+                        auctionRef.child("winnerId").setValue(userId);
                     }
 
                     @Override
@@ -157,19 +184,20 @@ public class ActivityAuctionAdapter extends RecyclerView.Adapter<ActivityAuction
         });
 
         holder.contactWinner.setOnClickListener(new View.OnClickListener() {
-            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
             @Override
             public void onClick(View view) {
                 auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.hasChild("winnerBidder")){
+                        if(snapshot.hasChild("winnerId")){
+                            String winnerBidder = snapshot.child("winnerId").getValue(String.class);
+                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child("winnerId");
+
                             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot userSnapshot) {
                                     String mobile = userSnapshot.child("phone").getValue(String.class);
-                                    holder.statusTextView.setText(mobile);
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/91" + mobile));
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     context.startActivity(intent);
@@ -188,8 +216,6 @@ public class ActivityAuctionAdapter extends RecyclerView.Adapter<ActivityAuction
 
                     }
                 });
-
-
             }
         });
 

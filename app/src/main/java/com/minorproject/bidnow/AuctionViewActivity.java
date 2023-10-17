@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -177,7 +179,7 @@ public class AuctionViewActivity extends AppCompatActivity {
         auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child("currentBidder").exists() && snapshot.child("currentBidder").getValue(String.class).equals(userId)){
+                if(snapshot.hasChild("currentBidder") && snapshot.child("currentBidder").getValue(String.class).equals(userId)){
                     addBid.setEnabled(false);
                 }
             }
@@ -191,7 +193,17 @@ public class AuctionViewActivity extends AppCompatActivity {
         addBid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                auctionRef.child("currentBidder").setValue(userId);
+                auctionRef.child("currentBidder").setValue(userId).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(AuctionViewActivity.this, "Bid Added!", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(AuctionViewActivity.this, "Unable to Add Bid!", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 auctionRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot auctionSnapshot) {
